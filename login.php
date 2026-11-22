@@ -2,13 +2,14 @@
 require_once __DIR__ . '/config/db.php';
 
 if (isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['role'] === 'donor' ? 'donor_dashboard.php' : 'volunteer_dashboard.php'));
+    header("Location: " . roleHome($_SESSION['role']));
     exit;
 }
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrfCheck();
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -16,16 +17,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if (!$user || !password_verify($password, $user['password_hash'])) {
+        $error = "Invalid email or password.";
+    } elseif ($user['verification_status'] === 'rejected') {
+        // admin memblokir akun ini
+        $error = "Akun ini diblokir oleh admin. Hubungi admin@porsela untuk klarifikasi.";
+    } else {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['full_name'] = $user['full_name'];
         $_SESSION['role'] = $user['role'];
+        $_SESSION['verification_status'] = $user['verification_status'];
 
-        header("Location: " . ($user['role'] === 'donor' ? 'donor_dashboard.php' : 'volunteer_dashboard.php'));
+        header("Location: " . roleHome($user['role']));
         exit;
-    } else {
-        $error = "Invalid email or password.";
     }
 }
 ?>
@@ -34,13 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Berbagi</title>
+    <title>Login - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <nav class="navbar">
     <div class="nav-container">
-        <a href="index.php" class="brand">Berbagi</a>
+        <a href="index.php" class="brand">Porsela</a>
         <div class="nav-links">
             <a href="register.php" class="btn btn-primary btn-sm">Register</a>
         </div>
@@ -55,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?= csrfField() ?>
             <div class="form-group">
                 <label>Email Address</label>
                 <input type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">

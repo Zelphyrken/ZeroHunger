@@ -9,36 +9,45 @@ $stmt->execute([$donationId, $_SESSION['user_id']]);
 $donation = $stmt->fetch();
 
 if (!$donation) {
-    die("Donation not found or access denied. <a href='donor_dashboard.php'>Back to Dashboard</a>");
+    die("Donasi tidak ditemukan atau bukan milikmu. <a href='donor_dashboard.php'>Kembali ke dashboard</a>");
 }
 
-if ($donation['status'] === 'distributed') {
-    die("This donation has already been distributed and can no longer be edited. <a href='donor_dashboard.php'>Back to Dashboard</a>");
+// Kalau sudah ada klaim aktif atau sudah tersalurkan, porsi/isi donasi tidak boleh diubah lagi.
+$claimStmt = $pdo->prepare("SELECT COUNT(*) FROM claims WHERE donation_id = ? AND status_claim IN ('menunggu', 'disetujui', 'selesai')");
+$claimStmt->execute([$donationId]);
+$activeClaims = (int)$claimStmt->fetchColumn();
+
+if ($donation['status'] === 'distributed' || $activeClaims > 0) {
+    die("Donasi ini sudah diklaim penerima, jadi tidak bisa diedit lagi. <a href='donor_dashboard.php'>Kembali ke dashboard</a>");
 }
 
-$allowedCategories = ['Clothing / Shirt', 'Food', 'Toys', 'Other'];
-$allowedTargets = ['Anyone in Need', 'Street Workers', 'Orphans', 'Elderly', 'Disaster Victims'];
+$categories = $pdo->query("SELECT * FROM categories ORDER BY nama")->fetchAll();
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrfCheck();
     $title = trim($_POST['title'] ?? '');
-    $category = $_POST['category'] ?? '';
-    $quantity = trim($_POST['quantity'] ?? '');
-    $targetGroup = $_POST['target_group'] ?? '';
-    $description = trim($_POST['description'] ?? '');
+    $categoryId = (int)($_POST['category_id'] ?? 0);
+    $porsi = (int)($_POST['porsi'] ?? 0);
+    $expiresAt = trim($_POST['expires_at'] ?? '');
+    $deliveryMethod = in_array($_POST['delivery_method'] ?? '', ['ambil', 'antar'], true) ? $_POST['delivery_method'] : '';
     $pickupAddress = trim($_POST['pickup_address'] ?? '');
+    $description = trim($_POST['description'] ?? '');
 
-    if (!$title || !$quantity || !$description || !$pickupAddress ||
-        !in_array($category, $allowedCategories, true) ||
-        !in_array($targetGroup, $allowedTargets, true)) {
-        $error = "Please fill in all fields accurately.";
+    $catStmt = $pdo->prepare("SELECT * FROM categories WHERE id = ?");
+    $catStmt->execute([$categoryId]);
+    $category = $catStmt->fetch();
+
+    $ts = strtotime($expiresAt);
+
+    if (!$title || !$category || $porsi < 1 || !$deliveryMethod || !$pickupAddress || !$description) {
+        $error = "Semua kolom wajib diisi dan jumlah porsi minimal 1.";
+    } elseif ($ts === false) {
+        $error = "Batas layak konsumsi tidak valid.";
     } else {
         $newPhotoPath = $donation['item_photo'];
-        $newVideoPath = $donation['item_video'];
         $uploadedNewPhoto = false;
-        $uploadedNewVideo = false;
 
-        // Replace photo only if a new file was selected
         if (isset($_FILES['item_photo']) && $_FILES['item_photo']['error'] !== UPLOAD_ERR_NO_FILE) {
             $photoResult = handleUpload(
                 $_FILES['item_photo'],
@@ -46,74 +55,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'items',
                 5 * 1024 * 1024
             );
+
             if (isset($photoResult['error'])) {
-                $error = "Item Photo Error: " . $photoResult['error'];
+                $error = "Foto makanan: " . $photoResult['error'];
             } else {
                 $newPhotoPath = $photoResult['path'];
                 $uploadedNewPhoto = true;
             }
         }
 
-        // Replace video only if a new file was selected and no photo error occurred
-        if (!$error && isset($_FILES['item_video']) && $_FILES['item_video']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $videoResult = handleUpload(
-                $_FILES['item_video'],
-                ['video/mp4' => 'mp4', 'video/webm' => 'webm', 'video/quicktime' => 'mov'],
-                'items',
-                25 * 1024 * 1024
-            );
-            if (isset($videoResult['error'])) {
-                if ($uploadedNewPhoto) {
-                    @unlink(__DIR__ . '/' . $newPhotoPath);
-                }
-                $error = "Item Video Error: " . $videoResult['error'];
-            } else {
-                $newVideoPath = $videoResult['path'];
-                $uploadedNewVideo = true;
-            }
-        }
-
         if (!$error) {
-            $updateStmt = $pdo->prepare("
+            $upd = $pdo->prepare("
                 UPDATE donations
-                SET title = ?,
-                    category = ?,
-                    quantity = ?,
-                    target_group = ?,
-                    description = ?,
-                    pickup_address = ?,
-                    item_photo = ?,
-                    item_video = ?
-                WHERE id = ? AND donor_id = ? AND status != 'distributed'
+                SET title = ?, category_id = ?, porsi = ?,
+                    expires_at = ?, delivery_method = ?, pickup_address = ?, description = ?, item_photo = ?
+                WHERE id = ? AND donor_id = ?
             ");
-            $updateStmt->execute([
+            $upd->execute([
                 $title,
-                $category,
-                $quantity,
-                $targetGroup,
-                $description,
+                $categoryId,
+                $porsi,
+                date('Y-m-d H:i:s', $ts),
+                $deliveryMethod,
                 $pickupAddress,
+                $description,
                 $newPhotoPath,
-                $newVideoPath,
                 $donationId,
-                $_SESSION['user_id']
+                $_SESSION['user_id'],
             ]);
 
-            if ($updateStmt->rowCount() > 0 || (!$uploadedNewPhoto && !$uploadedNewVideo)) {
-                // Clean up old files if replaced
-                if ($uploadedNewPhoto) {
-                    @unlink(__DIR__ . '/' . $donation['item_photo']);
-                }
-                if ($uploadedNewVideo) {
-                    @unlink(__DIR__ . '/' . $donation['item_video']);
-                }
-                header("Location: donor_dashboard.php?updated=1");
-                exit;
-            } else {
-                if ($uploadedNewPhoto) @unlink(__DIR__ . '/' . $newPhotoPath);
-                if ($uploadedNewVideo) @unlink(__DIR__ . '/' . $newVideoPath);
-                $error = "Unable to update. The donation may have already been distributed.";
+            if ($uploadedNewPhoto && $donation['item_photo'] && $donation['item_photo'] !== $newPhotoPath) {
+                @unlink(__DIR__ . '/' . $donation['item_photo']);
             }
+
+            header("Location: donor_dashboard.php?updated=1");
+            exit;
         }
     }
 }
@@ -123,97 +99,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Donation - Berbagi</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=2">
+    <title>Edit Donation - Porsela</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="<?= themeClass() ?>">
 <nav class="navbar">
     <div class="nav-container">
-        <a href="index.php" class="brand">Berbagi</a>
+        <a href="index.php" class="brand">Porsela</a>
         <div class="nav-links">
-            <a href="donor_dashboard.php" class="btn btn-outline btn-sm">Back to Dashboard</a>
-            <a href="logout.php" class="btn btn-outline btn-sm">Logout</a>
+            <a href="donor_dashboard.php" class="btn btn-outline btn-sm">Kembali ke Dashboard</a>
+            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
         </div>
     </div>
 </nav>
 
 <main class="container">
     <section class="form-panel">
-        <h2 class="section-title">Edit Donation Submission</h2>
-
-        <?php if ($donation['status'] === 'claimed'): ?>
-            <div class="alert" style="background: var(--info-bg); color: var(--info-text);">
-                Note: A volunteer has already claimed this item for pickup, but it has not been distributed yet.
-            </div>
-        <?php endif; ?>
-
+        <h2 class="section-title">Edit Donasi: <?= e($donation['title']) ?></h2>
         <?php if ($error): ?>
             <div class="alert alert-error"><?= e($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
+            <?= csrfField() ?>
             <input type="hidden" name="donation_id" value="<?= (int)$donation['id'] ?>">
-
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Item Title</label>
+                    <label>Nama Makanan</label>
                     <input type="text" name="title" required value="<?= e($_POST['title'] ?? $donation['title']) ?>">
                 </div>
                 <div class="form-group">
-                    <label>Category</label>
-                    <select name="category" required>
-                        <?php $curCat = $_POST['category'] ?? $donation['category']; ?>
-                        <?php foreach ($allowedCategories as $cat): ?>
-                            <option value="<?= e($cat) ?>" <?= $curCat === $cat ? 'selected' : '' ?>><?= e($cat) ?></option>
+                    <label>Kategori</label>
+                    <select name="category_id" required>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?= (int)$cat['id'] ?>" <?= (int)$cat['id'] === (int)$donation['category_id'] ? 'selected' : '' ?>>
+                                <?= e($cat['nama']) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="text" name="quantity" required value="<?= e($_POST['quantity'] ?? $donation['quantity']) ?>">
+                    <label>Jumlah Porsi</label>
+                    <input type="number" name="porsi" min="1" required value="<?= (int)$donation['porsi'] ?>">
                 </div>
                 <div class="form-group">
-                    <label>Target Recipient</label>
-                    <select name="target_group" required>
-                        <?php $curTarget = $_POST['target_group'] ?? $donation['target_group']; ?>
-                        <?php foreach ($allowedTargets as $target): ?>
-                            <option value="<?= e($target) ?>" <?= $curTarget === $target ? 'selected' : '' ?>><?= e($target) ?></option>
-                        <?php endforeach; ?>
+                    <label>Batas Layak Konsumsi</label>
+                    <input type="datetime-local" name="expires_at" required
+                           value="<?= $donation['expires_at'] ? e(date('Y-m-d\TH:i', strtotime($donation['expires_at']))) : '' ?>">
+                </div>
+                <div class="form-group">
+                    <label>Metode Penyerahan</label>
+                    <select name="delivery_method" required>
+                        <option value="ambil" <?= $donation['delivery_method'] === 'ambil' ? 'selected' : '' ?>>Diambil sendiri oleh penerima</option>
+                        <option value="antar" <?= $donation['delivery_method'] === 'antar' ? 'selected' : '' ?>>Saya antarkan ke alamat penerima</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Ganti Foto (opsional)</label>
+                    <input type="file" name="item_photo" accept="image/jpeg,image/png,image/webp">
+                    <p class="form-hint">Biarkan kosong kalau tidak ingin ganti foto (maks 5MB).</p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Pickup Address / Location</label>
+                <label>Alamat / Lokasi</label>
                 <input type="text" name="pickup_address" required value="<?= e($_POST['pickup_address'] ?? $donation['pickup_address']) ?>">
             </div>
 
             <div class="form-group">
-                <label>Item Description &amp; Condition</label>
+                <label>Deskripsi &amp; Catatan Allergen</label>
                 <textarea name="description" rows="3" required><?= e($_POST['description'] ?? $donation['description']) ?></textarea>
             </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Current Photo (Upload new to replace)</label>
-                    <img src="<?= e($donation['item_photo']) ?>" alt="Current item photo" class="media-preview">
-                    <input type="file" name="item_photo" accept="image/jpeg,image/png,image/webp">
-                    <p class="form-hint">Leave empty to keep current photo (Max 5MB)</p>
-                </div>
-                <div class="form-group">
-                    <label>Current Video (Upload new to replace)</label>
-                    <video controls preload="metadata" class="media-preview">
-                        <source src="<?= e($donation['item_video']) ?>">
-                    </video>
-                    <input type="file" name="item_video" accept="video/mp4,video/webm,video/quicktime">
-                    <p class="form-hint">Leave empty to keep current video (Max 25MB)</p>
-                </div>
-            </div>
+            <img src="<?= e($donation['item_photo']) ?>" alt="Foto saat ini" class="media-preview">
 
-            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="donor_dashboard.php" class="btn btn-outline">Cancel</a>
-            </div>
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
         </form>
     </section>
 </main>
