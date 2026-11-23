@@ -23,91 +23,149 @@ $stmt = $pdo->query("
 $recentDistributions = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Porsela - Rescue Surplus Food, Feed Those in Need</title>
+    <meta name="description" content="PORSELA menghubungkan makanan berlebih yang masih layak konsumsi dengan masyarakat yang membutuhkan. Berbagi porsi, menumbuhkan harapan.">
+    <meta name="theme-color" content="#f7f5ed">
+    <title>PORSELA — Berbagi Porsi, Menumbuhkan Harapan</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <script src="assets/js/home.js" defer></script>
 </head>
-<body>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
+<body class="home-page">
+<a href="#home-main" class="home-skip">Lewati ke konten utama</a>
+<header class="home-header">
+    <nav class="home-nav home-wrap" aria-label="Navigasi utama">
+        <a href="index.php" class="home-brand" aria-label="PORSELA, beranda" aria-current="page">PORSELA<span class="home-brand-dot" aria-hidden="true">.</span></a>
+        <button class="home-menu-toggle" type="button" aria-expanded="false" aria-controls="home-navigation" hidden>
+            <span>Menu</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+        </button>
+        <div class="home-nav-links" id="home-navigation">
+            <a href="#cara-berbagi" class="home-nav-link">Cara berbagi</a>
+            <a href="#cerita-berbagi" class="home-nav-link">Cerita berbagi</a>
+            <a href="dashboard.php" class="home-nav-link">Dampak</a>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="nav-user">Hi, <?= e($_SESSION['full_name']) ?> (<?= e(roleLabel($_SESSION['role'])) ?>)</span>
-                <a href="<?= e(roleHome($_SESSION['role'])) ?>" class="btn btn-primary btn-sm">Dashboard</a>
-                <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-                <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
+                <span class="home-nav-user">Halo, <?= e($_SESSION['full_name']) ?><small><?= e(roleLabel($_SESSION['role'])) ?></small></span>
+                <a href="<?= e(roleHome($_SESSION['role'])) ?>" class="home-button home-button-green home-nav-cta">Dashboard</a>
+                <a href="logout.php?csrf=<?= csrfToken() ?>" class="home-nav-link">Logout</a>
             <?php else: ?>
-                <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-                <a href="login.php" class="btn btn-outline btn-sm">Login</a>
-                <a href="register.php" class="btn btn-primary btn-sm">Register</a>
+                <a href="login.php" class="home-nav-link">Login</a>
+                <a href="register.php" class="home-button home-button-green home-nav-cta">Daftar untuk berbagi</a>
             <?php endif; ?>
         </div>
-    </div>
-</nav>
-<section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./assets/images/header.png'); height: 75vh; background-size: cover; background-position: center;">
-    <h1>Turn Surplus Food Into Someone's Meal</h1>
-    <p>Porsela connects food donors &mdash; restaurants, bakeries, caterers, households &mdash; with the people who need it most. Post surplus food with a photo, set its safe-to-eat deadline, and let receivers claim the portions they need. Supporting SDG 2: Zero Hunger.</p>
-    <div class="hero-actions">
-        <a href="register.php?role=donor" class="btn btn-accent">Share Surplus Food (Donor)</a>
-        <a href="register.php?role=beneficiary" class="btn btn-outline" style="color:#fff; border-color:#fff;">Find Food Nearby (Receiver)</a>
-    </div>
-</section>
+    </nav>
+</header>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <h3><?= (int)$totalDonations ?></h3>
-        <p>Total Submissions</p>
-    </div>
-    <div class="stat-card">
-        <h3><?= (int)$distributedCount ?></h3>
-        <p>Items Distributed</p>
-    </div>
-    <div class="stat-card">
-            <h3><?= (int)$verifiedDonors ?></h3>
-            <p>Verified Donors</p>
+<main id="home-main" tabindex="-1">
+    <section class="home-hero home-wrap" aria-labelledby="home-title">
+        <h1 id="home-title">Berbagi porsi,<br>menumbuhkan <em>harapan.</em></h1>
+        <div class="home-hero-intro">
+            <p>Makanan berlebih, kesempatan untuk peduli. PORSELA menghubungkan makanan yang masih layak konsumsi dengan masyarakat yang membutuhkan.</p>
+            <div class="home-actions">
+                <a href="register.php?role=donor" class="home-button home-button-amber">Mulai Berdonasi</a>
+                <a href="register.php?role=beneficiary" class="home-button home-button-outline">Cari Makanan</a>
+            </div>
         </div>
-    </div>
+        <figure class="home-hero-figure">
+            <img src="assets/images/header.png" width="1366" height="786" alt="Orang-orang saling menggenggam tangan di sekeliling meja sebagai bentuk kebersamaan." fetchpriority="high">
+            <figcaption><span>Berawal dari kepedulian. Bertumbuh lewat kebersamaan.</span><span class="home-photo-note">Porsi berlebih jadi berarti.</span></figcaption>
+        </figure>
+    </section>
 
-    <main class="container">
-        <h2 class="section-title">Recent Verified Distributions</h2>
+    <section class="home-impact home-wrap" aria-labelledby="home-impact-title">
+        <div class="home-impact-intro">
+            <h2 id="home-impact-title">Kebaikan yang<br>terus tersambung.</h2>
+            <a class="home-text-link" href="dashboard.php">Lihat dampak bersama</a>
+        </div>
+        <dl class="home-stats">
+            <div><dt>Total Donasi</dt><dd><?= number_format((int)$totalDonations, 0, ',', '.') ?></dd></div>
+            <div><dt>Makanan Tersalurkan</dt><dd><?= number_format((int)$distributedCount, 0, ',', '.') ?></dd></div>
+            <div><dt>Donatur Terverifikasi</dt><dd><?= number_format((int)$verifiedDonors, 0, ',', '.') ?></dd></div>
+        </dl>
+    </section>
+
+    <section class="home-stories home-wrap" id="cerita-berbagi" aria-labelledby="home-stories-title">
+        <div class="home-section-heading">
+            <h2 id="home-stories-title">Porsi tersalurkan.<br><em>Kepedulian tersampaikan.</em></h2>
+            <p>Distribusi terbaru dari komunitas PORSELA. Dari makanan yang dibagikan hingga bukti penerimaan, setiap proses punya cerita.</p>
+        </div>
         <?php if (empty($recentDistributions)): ?>
-            <p class="meta-text">No completed distributions yet. Be the first to share surplus food!</p>
-    <?php else: ?>
-        <div class="grid-cards">
+            <div class="home-empty">
+                <h3>Cerita berbagi pertama bisa dimulai dari Anda.</h3>
+                <p>Belum ada distribusi yang selesai. Bagikan makanan berlebih yang masih layak konsumsi dan mulai sambungkan kebaikan.</p>
+                <a href="register.php?role=donor" class="home-text-link">Mulai Berdonasi</a>
+            </div>
+        <?php else: ?>
+        <div class="home-distributions">
             <?php foreach ($recentDistributions as $item): ?>
-                <article class="card">
-                    <div class="media-row">
-                                            <img src="<?= e($item['item_photo']) ?>" alt="Food donation">
-                                            <img src="<?= e($item['proof_photo'] ?? '') ?>" alt="Proof of receipt">
-                                        </div>
-                                        <div class="card-body">
-                                            <div>
-                                                <span class="badge badge-distributed">Distributed</span>
-                                                <span class="badge badge-target"><?= $item['delivery_method'] === 'antar' ? 'Delivered' : 'Picked up' ?></span>
-                                            </div>
-                                            <h3><?= e($item['title']) ?></h3>
-                                            <p class="meta-text">
-                                                <strong>Category:</strong> <?= e($item['category_name'] ?? '-') ?> | <strong>Porsi:</strong> <?= (int)$item['porsi'] ?>
-                                            </p>
-                                            <p class="meta-text">
-                                                <strong>Donor:</strong> <?= e($item['donor_name']) ?>
-                                            </p>
-                                            <?php if (!empty($item['received_notes'])): ?>
-                                                <p style="font-size:0.9rem;">"<?= e($item['received_notes']) ?>"</p>
-                                            <?php endif; ?>
+                <article class="home-distribution">
+                    <div class="home-distribution-media">
+                        <div class="home-food-photo home-media">
+                            <span class="home-image-fallback">Foto makanan belum tersedia</span>
+                            <?php if (!empty($item['item_photo'])): ?>
+                                <img src="<?= e($item['item_photo']) ?>" alt="Makanan donasi: <?= e($item['title']) ?>" width="640" height="480" loading="lazy" decoding="async" data-home-image>
+                            <?php endif; ?>
+                        </div>
+                        <?php if (!empty($item['proof_photo'])): ?>
+                            <figure class="home-proof">
+                                <div class="home-media">
+                                    <span class="home-image-fallback">Foto bukti tidak tersedia</span>
+                                    <img src="<?= e($item['proof_photo']) ?>" alt="Bukti penerimaan donasi <?= e($item['title']) ?>" width="160" height="120" loading="lazy" decoding="async" data-home-image>
+                                </div>
+                                <figcaption>Bukti penerimaan</figcaption>
+                            </figure>
+                        <?php endif; ?>
+                    </div>
+                    <div class="home-distribution-body">
+                        <div class="home-distribution-status"><span class="home-status">Tersalurkan</span><span><?= $item['delivery_method'] === 'antar' ? 'Diantar' : 'Diambil langsung' ?></span></div>
+                        <h3><?= e($item['title']) ?></h3>
+                        <p class="home-donor">Dibagikan oleh <strong><?= e($item['donor_name']) ?></strong></p>
+                        <dl class="home-distribution-details">
+                            <div><dt>Jumlah</dt><dd><?= number_format((int)$item['porsi'], 0, ',', '.') ?> porsi</dd></div>
+                            <div><dt>Kategori</dt><dd><?= e($item['category_name'] ?? '-') ?></dd></div>
+                        </dl>
+                        <?php if (!empty($item['received_notes'])): ?>
+                            <blockquote class="home-receipt-note"><p>&ldquo;<?= e($item['received_notes']) ?>&rdquo;</p><cite>Catatan penerimaan</cite></blockquote>
+                        <?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>
         </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </section>
+
+    <section class="home-how" id="cara-berbagi" aria-labelledby="home-how-title">
+        <div class="home-wrap home-how-layout">
+            <div class="home-how-intro">
+                <h2 id="home-how-title">Ada porsi lebih?<br><em>Ada cara berbagi.</em></h2>
+                <p>Dari dapur rumah, warung, restoran, hingga katering. Kepedulian Anda bisa sampai ke meja makan berikutnya.</p>
+                <a href="register.php?role=donor" class="home-text-link">Bagikan makanan Anda</a>
+            </div>
+            <ol class="home-steps">
+                <li><span class="home-step-number" aria-hidden="true">01</span><div><h3>Bagikan makanan berlebih</h3><p>Donatur mengunggah foto makanan, jumlah porsi, batas layak konsumsi, dan metode penyerahan.</p></div></li>
+                <li><span class="home-step-number" aria-hidden="true">02</span><div><h3>Temukan dan ajukan klaim</h3><p>Penerima mencari makanan yang tersedia dan mengajukan klaim sesuai jumlah porsi yang dibutuhkan.</p></div></li>
+                <li><span class="home-step-number" aria-hidden="true">03</span><div><h3>Selesaikan penyerahan bersama</h3><p>Donatur dan penerima menyelesaikan penyerahan. Bukti penerimaan melengkapi cerita berbagi.</p></div></li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="home-closing home-wrap" aria-labelledby="home-closing-title">
+        <div><h2 id="home-closing-title">Porsi kecil Anda.<br><em>Arti besar bagi sesama.</em></h2><p>Makanan yang masih baik layak mendapat kesempatan untuk dinikmati. Mari mulai dari yang bisa kita bagikan hari ini.</p></div>
+        <a href="register.php" class="home-button home-button-green">Jadi bagian dari PORSELA</a>
+    </section>
 </main>
 
-<footer>
-    <p>&copy; <?= date('Y') ?> Porsela Platform &mdash; porsi berlebih jadi makanan. Built with native HTML, CSS &amp; PHP. Supporting SDG 2: Zero Hunger.</p>
+<footer class="home-footer">
+    <div class="home-wrap">
+        <div class="home-footer-top">
+            <div><a href="index.php" class="home-brand" aria-label="PORSELA, beranda">PORSELA<span class="home-brand-dot" aria-hidden="true">.</span></a><p>Porsi berlebih jadi makanan.<br>Kepedulian menjadi kebersamaan.</p></div>
+            <nav class="home-footer-links" aria-label="Navigasi footer"><a href="#cara-berbagi">Cara berbagi</a><a href="dashboard.php">Dampak bersama</a><a href="register.php">Bergabung</a></nav>
+            <div class="home-sdg"><span class="home-sdg-number" aria-hidden="true">2</span><p>Mendukung SDG 2<strong>Zero Hunger</strong><span>Bersama menuju dunia tanpa kelaparan.</span></p></div>
+        </div>
+        <div class="home-footer-bottom"><p>&copy; <?= date('Y') ?> PORSELA Platform</p><p>Dibangun dengan HTML, CSS &amp; PHP native.</p></div>
+    </div>
 </footer>
 </body>
 </html>
