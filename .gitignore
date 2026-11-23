@@ -1,0 +1,3 @@
+# Hanya folder docs/ yang tidak ikut repo (dokumen kerja: PRD markdown + hasil generate html/pdf).
+# Berkas yang dibutuhkan penilaian (README.md, kode, database/, uploads/) tetap ikut dipantau git.
+docs/
