@@ -214,6 +214,12 @@ a {
     padding: 0 1.25rem;
 }
 
+/* Varian untuk halaman tanpa hero: margin negatif di atas hanya masuk akal
+   kalau ada hero yang ditumpuk, di halaman biasa dia menabrak teks di atasnya. */
+.stats-grid-inline {
+    margin-top: 1.75rem;
+}
+
 .stat-card {
     background: var(--surface);
     padding: 1.5rem;
@@ -309,6 +315,85 @@ a {
 .badge-claimed { background: var(--info-bg); color: var(--info-text); }
 .badge-distributed { background: var(--success-bg); color: var(--success-text); }
 .badge-target { background: #f1f5f9; color: #334155; }
+.badge-delivery { background: var(--success-bg); color: var(--success-text); }
+.badge-pickup { background: var(--info-bg); color: var(--info-text); }
+
+/* Filter bar (live search) */
+.filter-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
+
+.filter-bar .form-group {
+    margin-bottom: 0;
+}
+
+/* Elemen yang disembunyikan live search */
+[hidden] {
+    display: none !important;
+}
+
+/* Tabel rekap */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.table th,
+.table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+}
+
+.table th {
+    background: rgba(15, 118, 110, 0.08);
+    font-weight: 700;
+}
+
+/* Tema gelap, aktif dari cookie theme=dark */
+body.dark {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+    --success-bg: #14532d;
+    --success-text: #bbf7d0;
+    --warn-bg: #78350f;
+    --warn-text: #fde68a;
+    --info-bg: #1e3a8a;
+    --info-text: #bfdbfe;
+    --danger-bg: #7f1d1d;
+    --danger-text: #fecaca;
+}
+
+body.dark .form-group input,
+body.dark .form-group select,
+body.dark .form-group textarea {
+    background: #0f172a;
+    color: var(--text);
+}
+
+body.dark .btn-outline:hover {
+    background: #1e293b;
+}
+
+body.dark .table th {
+    background: rgba(45, 212, 191, 0.12);
+}
 
 /* Forms */
 .auth-box {
