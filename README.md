@@ -3,12 +3,12 @@
 ## 1. Nama dan Deskripsi Proyek
 
 **Nama proyek:** Porsela (dari "porsi selamat")
+
 **Deskripsi:** Porsela adalah aplikasi web yang menghubungkan pemilik makanan berlebih dengan pihak yang membutuhkan. Restoran, katering, toko roti, maupun rumah tangga bisa memublikasikan makanan yang masih layak konsumsi; panti asuhan, posyandu, dan dapur umum komunitas bisa mencari dan mengklaim porsi sesuai kebutuhan, lalu mengunggah bukti terima sebagai jejak penyaluran.
 
 Aplikasi dibangun dengan PHP native (tanpa framework) dan MySQL/MariaDB sehingga mudah dijalankan di XAMPP, mudah dibaca, dan tidak memerlukan dependensi eksternal.
 
-Tema: **SDG 2 — Zero Hunger (Tanpa Kelaparan)**.
-Dokumen kebutuhan produk lengkap tersedia di [`docs/PRD_Porsela.md`](docs/PRD_Porsela.md) (versi PDF: `docs/PRD_Porsela.pdf`).
+**Tema:** SDG 2 — Zero Hunger (Tanpa Kelaparan)
 
 ## 2. Latar Belakang dan Tujuan Proyek
 
@@ -59,7 +59,6 @@ Modul tambahan (pengembangan dari rancangan awal):
 | Server lokal | XAMPP (Apache 2.4 + MariaDB 10.4 — diuji pada PHP 8.3 dan MariaDB 10.4.32) |
 | Frontend | HTML5, CSS3 (variabel CSS, tema terang/gelap, grid responsif), JavaScript vanilla (manipulasi DOM untuk live search) |
 | Penyimpanan berkas | Folder `uploads/items` (foto makanan) dan `uploads/proofs` (bukti terima) |
-| Dokumentasi | Markdown (`README.md`, `docs/PRD_Porsela.md`) |
 | Version control | Git + GitHub |
 
 Tanpa dependensi eksternal: tidak ada framework PHP, tidak ada library frontend, tidak ada `composer install` maupun `npm install`.
@@ -155,7 +154,7 @@ Lalu buka `http://localhost:8000/index.php`.
 | Penerima | `beneficiary` | Live search, ajukan klaim, unggah bukti terima, beri ulasan |
 | Admin | `admin` | Verifikasi/tolak akun donatur, audit read-only semua donasi, CRUD kategori |
 
-Donatur yang belum diverifikasi tetap bisa posting, tetapi donasinya belum muncul di pencarian penerima.
+Donatur yang belum diverifikasi tetap bisa posting, tetapi donasinya belum muncul di pencarian penerima. Peran admin tidak bisa didaftarkan sendiri melalui halaman register; akunnya disiapkan lewat data awal.
 
 ## Lampiran
 
@@ -174,7 +173,7 @@ Donatur yang belum diverifikasi tetap bisa posting, tetapi donasinya belum muncu
 ```
 index.php                 landing page publik (statistik + distribusi terverifikasi)
 dashboard.php             halaman dampak publik (porsi terselamatkan, rekap kategori/metode)
-login.php register.php    autentikasi dua peran (donor/beneficiary)
+login.php register.php    masuk dan daftar untuk peran donatur & penerima
 logout.php                logout bertoken CSRF
 donor_dashboard.php       posting donasi, keputusan klaim, daftar donasi sendiri
 edit_donation.php         edit donasi (ditolak bila sudah ada klaim aktif)
@@ -185,10 +184,12 @@ profile.php               ubah nama/HP, ganti password, tema gelap (cookie)
 config/db.php             koneksi PDO + helper (e, requireRole, roleHome, csrf*, syncDonationStatus, handleUpload)
 assets/css/style.css      tema terang/gelap, badge, tabel, filter bar
 assets/js/live-search.js  filter kata kunci + kategori + metode tanpa reload
-database/                 skema, migrasi v2/v3, seed demo
-docs/                     PRD (markdown, html, pdf)
-uploads/items, uploads/proofs   foto makanan & bukti terima
+database/                 skema awal, migrasi v2 & v3, seed demo
+uploads/items             foto makanan yang didonasikan
+uploads/proofs            foto bukti terima dari penerima
 ```
+
+Catatan: folder `docs/` (draft PRD beserta hasil generate HTML/PDF) tidak ikut masuk repo karena sudah terdaftar di `.gitignore`.
 
 ### Keamanan yang sudah diterapkan
 
