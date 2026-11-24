@@ -58,62 +58,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Register - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <a href="login.php" class="btn btn-outline btn-sm">Login</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<div class="container">
+<main class="container auth-layout" id="main-content" tabindex="-1">
+    <section class="auth-story"><h1>Satu akun. Banyak kesempatan berbagi.</h1><p>Jadi donatur atau penerima. Mulai dari satu porsi untuk membuat kepedulian sampai ke meja berikutnya.</p><a href="index.php">Tentang PORSELA</a></section>
     <div class="auth-box">
-        <h2 style="margin-bottom:1rem;">Create an Account</h2>
+        <h2>Bergabung dengan PORSELA</h2>
         <?php if ($error): ?>
-            <div class="alert alert-error"><?= e($error) ?></div>
+            <div class="alert alert-error" role="alert"><?= e($error) ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <?= csrfField() ?>
             <div class="form-group">
-                <label>I want to join as</label>
-                <select name="role" required>
-                    <option value="donor" <?= $selectedRole === 'donor' ? 'selected' : '' ?>>Donor (Share Surplus Food)</option>
-                    <option value="beneficiary" <?= $selectedRole === 'beneficiary' ? 'selected' : '' ?>>Receiver (Find Food)</option>
+                <label>Saya ingin bergabung sebagai
+                    <select name="role" required>
+                    <option value="donor" <?= $selectedRole === 'donor' ? 'selected' : '' ?>>Donatur (berbagi makanan)</option>
+                    <option value="beneficiary" <?= $selectedRole === 'beneficiary' ? 'selected' : '' ?>>Penerima (mencari makanan)</option>
                 </select>
+                </label>
                 <p class="form-hint">Akun donor masuk antrean verifikasi admin dulu. Selama belum diverifikasi, donasinya tidak tampil di pencarian penerima.</p>
             </div>
             <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="full_name" required value="<?= e($_POST['full_name'] ?? '') ?>">
+                <label>Nama lengkap
+                    <input autocomplete="name" type="text" name="full_name" required value="<?= e($_POST['full_name'] ?? '') ?>">
+                </label>
             </div>
             <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+                <label>Alamat email
+                    <input autocomplete="email" spellcheck="false" type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+                </label>
             </div>
             <div class="form-group">
-                <label>Phone / WhatsApp Number</label>
-                <input type="text" name="phone" required placeholder="e.g. 08123456789" value="<?= e($_POST['phone'] ?? '') ?>">
+                <label>Nomor HP / WhatsApp
+                    <input autocomplete="tel" inputmode="tel" type="text" name="phone" required placeholder="e.g. 08123456789" value="<?= e($_POST['phone'] ?? '') ?>">
+                </label>
             </div>
             <div class="form-group">
-                <label>Password (min. 6 characters)</label>
-                <input type="password" name="password" required minlength="6">
+                <label>Password (minimal 6 karakter)
+                    <input autocomplete="new-password" type="password" name="password" required minlength="6">
+                </label>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">Register</button>
+            <button type="submit" class="btn btn-primary full-width">Daftar</button>
         </form>
-        <p class="meta-text" style="margin-top:1rem; text-align:center;">
-            Already have an account? <a href="login.php">Login here</a>
+        <p class="auth-switch">
+            Sudah punya akun? <a href="login.php">Login di sini</a>
         </p>
     </div>
-</div>
+</main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

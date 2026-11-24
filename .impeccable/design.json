@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23",
+  "title": "PORSELA Design System",
+  "extensions": {
+    "shadows": [],
+    "motion": [
+      { "name": "control", "value": "180ms ease-out", "purpose": "Hover, focus, dan feedback kontrol." },
+      { "name": "home-image", "value": "250ms ease-out", "purpose": "Hover foto distribusi pada perangkat pointer." }
+    ],
+    "breakpoints": [
+      { "name": "compact-desktop", "value": "1100px" },
+      { "name": "mobile-navigation", "value": "800px" },
+      { "name": "single-column", "value": "540px" },
+      { "name": "narrow-home", "value": "359px" }
+    ]
+  },
+  "narrative": {
+    "northStar": "Editorial komunitas PORSELA",
+    "overview": "Mempertahankan identitas Home terbaru dan menyesuaikan kepadatan untuk pekerjaan donatur, penerima, dan admin.",
+    "keyCharacteristics": ["Heading serif", "Hijau hutan dan krem hangat", "Permukaan datar", "Navigasi atas sesuai role"],
+    "rules": [
+      { "name": "Home sebagai acuan", "body": "Token diekstrak dari implementasi Home yang sudah ada.", "section": "colors" },
+      { "name": "Permukaan datar", "body": "Gunakan latar tonal atau border tanpa shadow dekoratif.", "section": "elevation" }
+    ],
+    "dos": ["Pertahankan field dan kondisi backend.", "Uji kedua tema dan layar sempit."],
+    "donts": ["Jangan tambahkan sidebar SaaS.", "Jangan menambahkan dependency runtime."]
+  }
+}

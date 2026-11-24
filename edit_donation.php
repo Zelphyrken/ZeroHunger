@@ -95,29 +95,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Edit Donation - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <a href="donor_dashboard.php" class="btn btn-outline btn-sm">Kembali ke Dashboard</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Perbarui donasi</h1><p>Periksa kembali informasi makanan, jumlah porsi, dan waktu penyerahan.</p><nav class="section-links"><a href="donor_dashboard.php">Kembali ke Dashboard</a></nav></header>
     <section class="form-panel">
         <h2 class="section-title">Edit Donasi: <?= e($donation['title']) ?></h2>
         <?php if ($error): ?>
-            <div class="alert alert-error"><?= e($error) ?></div>
+            <div class="alert alert-error" role="alert"><?= e($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
@@ -125,11 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" name="donation_id" value="<?= (int)$donation['id'] ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Nama Makanan</label>
+                    <label>Nama Makanan
                     <input type="text" name="title" required value="<?= e($_POST['title'] ?? $donation['title']) ?>">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Kategori</label>
+                    <label>Kategori
                     <select name="category_id" required>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= (int)$cat['id'] ?>" <?= (int)$cat['id'] === (int)$donation['category_id'] ? 'selected' : '' ?>>
@@ -137,45 +133,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Jumlah Porsi</label>
+                    <label>Jumlah Porsi
                     <input type="number" name="porsi" min="1" required value="<?= (int)$donation['porsi'] ?>">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Batas Layak Konsumsi</label>
+                    <label>Batas Layak Konsumsi
                     <input type="datetime-local" name="expires_at" required
                            value="<?= $donation['expires_at'] ? e(date('Y-m-d\TH:i', strtotime($donation['expires_at']))) : '' ?>">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Metode Penyerahan</label>
+                    <label>Metode Penyerahan
                     <select name="delivery_method" required>
                         <option value="ambil" <?= $donation['delivery_method'] === 'ambil' ? 'selected' : '' ?>>Diambil sendiri oleh penerima</option>
                         <option value="antar" <?= $donation['delivery_method'] === 'antar' ? 'selected' : '' ?>>Saya antarkan ke alamat penerima</option>
                     </select>
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Ganti Foto (opsional)</label>
+                    <label>Ganti Foto (opsional)
                     <input type="file" name="item_photo" accept="image/jpeg,image/png,image/webp">
+                </label>
                     <p class="form-hint">Biarkan kosong kalau tidak ingin ganti foto (maks 5MB).</p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Alamat / Lokasi</label>
-                <input type="text" name="pickup_address" required value="<?= e($_POST['pickup_address'] ?? $donation['pickup_address']) ?>">
+                <label>Alamat / Lokasi
+                    <input type="text" name="pickup_address" required value="<?= e($_POST['pickup_address'] ?? $donation['pickup_address']) ?>">
+                </label>
             </div>
 
             <div class="form-group">
-                <label>Deskripsi &amp; Catatan Allergen</label>
-                <textarea name="description" rows="3" required><?= e($_POST['description'] ?? $donation['description']) ?></textarea>
+                <label>Deskripsi &amp; Catatan Allergen
+                    <textarea name="description" rows="3" required><?= e($_POST['description'] ?? $donation['description']) ?></textarea>
+                </label>
             </div>
 
-            <img src="<?= e($donation['item_photo']) ?>" alt="Foto saat ini" class="media-preview">
+            <img src="<?= e($donation['item_photo']) ?>" alt="Foto saat ini" class="media-preview" width="640" height="480" loading="lazy" decoding="async" data-site-image>
 
             <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
         </form>
     </section>
 </main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

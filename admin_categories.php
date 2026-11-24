@@ -57,31 +57,25 @@ $rows = $pdo->query("
 ")->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Kategori - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <a href="admin_dashboard.php" class="btn btn-outline btn-sm">Admin Panel</a>
-            <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page category-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Kategori makanan</h1><p>Kelola kategori agar makanan lebih mudah ditemukan oleh penerima.</p></header>
     <?php if ($error): ?>
-        <div class="alert alert-error"><?= e($error) ?></div>
+        <div class="alert alert-error" role="alert"><?= e($error) ?></div>
     <?php endif; ?>
     <?php if ($success): ?>
-        <div class="alert alert-success"><?= e($success) ?></div>
+        <div class="alert alert-success" role="status"><?= e($success) ?></div>
     <?php endif; ?>
 
     <section class="form-panel">
@@ -90,21 +84,26 @@ $rows = $pdo->query("
             <?= csrfField() ?>
             <input type="hidden" name="action" value="create">
             <div class="form-group">
-                <label>Nama kategori</label>
-                <input type="text" name="nama" required placeholder="mis. Makanan Siap Santap">
+                <label>Nama kategori
+                    <input type="text" name="nama" required placeholder="mis. Makanan Siap Santap">
+                </label>
             </div>
             <div class="form-group">
-                <label>Deskripsi</label>
-                <input type="text" name="deskripsi" placeholder="keterangan singkat">
+                <label>Deskripsi
+                    <input type="text" name="deskripsi" placeholder="keterangan singkat">
+                </label>
             </div>
             <div class="form-group">
-                <label>&nbsp;</label>
+                <span class="form-spacer" aria-hidden="true"></span>
                 <button type="submit" class="btn btn-primary">Tambah</button>
             </div>
         </form>
     </section>
 
     <h2 class="section-title">Daftar Kategori (<?= count($rows) ?>)</h2>
+    <?php if (empty($rows)): ?>
+        <p class="empty-state">Belum ada kategori. Tambahkan kategori makanan melalui form di atas.</p>
+    <?php endif; ?>
     <div class="grid-cards">
         <?php foreach ($rows as $row): ?>
             <article class="card">
@@ -117,12 +116,14 @@ $rows = $pdo->query("
                         <input type="hidden" name="action" value="update">
                         <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
                         <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" name="nama" required value="<?= e($row['nama']) ?>">
+                            <label>Nama
+                    <input type="text" name="nama" required value="<?= e($row['nama']) ?>">
+                </label>
                         </div>
                         <div class="form-group">
-                            <label>Deskripsi</label>
-                            <input type="text" name="deskripsi" value="<?= e($row['deskripsi'] ?? '') ?>">
+                            <label>Deskripsi
+                    <input type="text" name="deskripsi" value="<?= e($row['deskripsi'] ?? '') ?>">
+                </label>
                         </div>
                         <button type="submit" class="btn btn-secondary btn-sm">Simpan</button>
                     </form>
@@ -137,5 +138,6 @@ $rows = $pdo->query("
         <?php endforeach; ?>
     </div>
 </main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

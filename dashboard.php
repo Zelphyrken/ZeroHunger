@@ -36,32 +36,21 @@ $reviewRow = $pdo->query("SELECT AVG(rating) AS rata, COUNT(*) AS jumlah FROM re
 $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) : null;
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Dampak - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="<?= e(roleHome($_SESSION['role'])) ?>" class="btn btn-outline btn-sm">Dashboard</a>
-                <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-            <?php else: ?>
-                <a href="login.php" class="btn btn-outline btn-sm">Login</a>
-                <a href="register.php" class="btn btn-primary btn-sm">Register</a>
-            <?php endif; ?>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
-    <h2 class="section-title">Dampak Porsela</h2>
-    <p class="meta-text">Angka dihitung dari klaim yang benar-benar selesai (penerima sudah kirim bukti terima).</p>
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Dampak bersama</h1><p>Angka dihitung dari klaim yang benar-benar selesai, setelah penerima mengirim bukti terima.</p></header>
+
 
     <div class="stats-grid stats-grid-inline">
         <div class="stat-card">
@@ -82,10 +71,10 @@ $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) :
         </div>
     </div>
 
-    <h3 class="section-title">Cara Porsi Disalurkan</h3>
+    <h2 class="section-title">Cara Porsi Disalurkan</h2>
     <table class="table">
         <thead>
-            <tr><th>Metode</th><th>Klaim Selesai</th><th>Porsi</th></tr>
+            <tr><th scope="col">Metode</th><th scope="col">Klaim Selesai</th><th scope="col">Porsi</th></tr>
         </thead>
         <tbody>
             <?php if (empty($byMethod)): ?>
@@ -102,12 +91,15 @@ $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) :
         </tbody>
     </table>
 
-    <h3 class="section-title" style="margin-top:2.5rem;">Rekap per Kategori</h3>
+    <h2 class="section-title">Rekap per Kategori</h2>
     <table class="table">
         <thead>
-            <tr><th>Kategori</th><th>Jumlah Donasi</th><th>Porsi Tersalur</th></tr>
+            <tr><th scope="col">Kategori</th><th scope="col">Jumlah Donasi</th><th scope="col">Porsi Tersalur</th></tr>
         </thead>
         <tbody>
+            <?php if (empty($byCategory)): ?>
+                <tr><td colspan="3">Belum ada kategori untuk direkap.</td></tr>
+            <?php endif; ?>
             <?php foreach ($byCategory as $row): ?>
                 <tr>
                     <td><?= e($row['nama']) ?></td>
@@ -118,7 +110,7 @@ $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) :
         </tbody>
     </table>
 
-    <h3 class="section-title" style="margin-top:2.5rem;">Ulasan Penerima</h3>
+    <h2 class="section-title">Ulasan Penerima</h2>
     <p class="meta-text">
         <?php if ($ratingAvg !== null): ?>
             Rata-rata bintang <strong><?= $ratingAvg ?></strong> dari <?= (int)$reviewRow['jumlah'] ?> ulasan.
@@ -128,8 +120,6 @@ $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) :
     </p>
 </main>
 
-<footer>
-    <p>&copy; <?= date('Y') ?> Porsela Platform &mdash; porsi berlebih jadi makanan. Supporting SDG 2: Zero Hunger.</p>
-</footer>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

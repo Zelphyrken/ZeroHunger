@@ -35,46 +35,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Login - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <a href="register.php" class="btn btn-primary btn-sm">Register</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<div class="container">
+<main class="container auth-layout" id="main-content" tabindex="-1">
+    <section class="auth-story"><h1>Kembali menyambung kebaikan.</h1><p>Masuk untuk melanjutkan berbagi makanan dan mengelola aktivitas Anda.</p><a href="index.php">Tentang PORSELA</a></section>
     <div class="auth-box">
-        <h2 style="margin-bottom:1rem;">Welcome Back</h2>
+        <h2>Selamat datang kembali</h2>
         <?php if ($error): ?>
-            <div class="alert alert-error"><?= e($error) ?></div>
+            <div class="alert alert-error" role="alert"><?= e($error) ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <?= csrfField() ?>
             <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+                <label>Alamat email
+                    <input autocomplete="email" spellcheck="false" type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+                </label>
             </div>
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
+                <label>Password
+                    <input autocomplete="current-password" type="password" name="password" required>
+                </label>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+            <button type="submit" class="btn btn-primary full-width">Login</button>
         </form>
-        <p class="meta-text" style="margin-top:1rem; text-align:center;">
-            Don't have an account? <a href="register.php">Register here</a>
+        <p class="auth-switch">
+            Belum punya akun? <a href="register.php">Daftar di sini</a>
         </p>
     </div>
-</div>
+</main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

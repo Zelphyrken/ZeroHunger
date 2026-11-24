@@ -188,36 +188,28 @@ $claimBadge = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>Receiver Dashboard - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <span class="nav-user">Penerima: <?= e($_SESSION['full_name']) ?></span>
-            <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-            <a href="profile.php" class="btn btn-outline btn-sm">Profil</a>
-            <a href="index.php" class="btn btn-outline btn-sm">Home</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Temukan porsi untuk hari ini</h1><p>Cari makanan yang tersedia dan ikuti proses klaim Anda di satu tempat.</p><nav class="section-links" aria-label="Bagian dashboard"><a href="#makanan-tersedia">Makanan tersedia</a><a href="#klaim-saya">Klaim saya</a></nav></header>
     <?php if ($error): ?>
-        <div class="alert alert-error"><?= e($error) ?></div>
+        <div class="alert alert-error" role="alert"><?= e($error) ?></div>
     <?php endif; ?>
     <?php if ($success): ?>
-        <div class="alert alert-success"><?= e($success) ?></div>
+        <div class="alert alert-success" role="status"><?= e($success) ?></div>
     <?php endif; ?>
 
-    <h2 class="section-title">Makanan Siap Diselamatkan (<span id="ls-count"><?= count($available) ?></span>)</h2>
+    <h2 class="section-title" id="makanan-tersedia">Makanan Siap Diselamatkan (<span id="ls-count" aria-live="polite"><?= count($available) ?></span>)</h2>
 
     <div class="filter-bar">
         <div class="form-group">
@@ -243,10 +235,10 @@ $claimBadge = [
         </div>
     </div>
 
-    <p class="meta-text" id="ls-empty" hidden>Tidak ada donasi yang cocok dengan filter.</p>
+    <p class="meta-text empty-state" id="ls-empty" role="status" hidden>Tidak ada donasi yang cocok dengan filter.</p>
 
     <?php if (empty($available)): ?>
-        <p class="meta-text">Belum ada donasi yang bisa diklaim saat ini.</p>
+        <p class="meta-text empty-state">Belum ada donasi yang bisa diklaim saat ini.</p>
     <?php else: ?>
         <div class="grid-cards">
             <?php foreach ($available as $item): ?>
@@ -254,7 +246,7 @@ $claimBadge = [
                          data-title="<?= e(strtolower($item['title'] . ' ' . $item['donor_name'])) ?>"
                          data-cat="<?= (int)$item['category_id'] ?>"
                          data-del="<?= e($item['delivery_method']) ?>">
-                    <img src="<?= e($item['item_photo']) ?>" alt="Makanan donasi" style="width:100%;height:170px;object-fit:cover;">
+                    <img src="<?= e($item['item_photo']) ?>" alt="Makanan donasi" class="card-photo" width="640" height="480" loading="lazy" decoding="async" data-site-image>
                     <div class="card-body">
                         <div>
                             <span class="badge <?= $item['delivery_method'] === 'antar' ? 'badge-delivery' : 'badge-pickup' ?>">
@@ -278,28 +270,32 @@ $claimBadge = [
                         <?php endif; ?>
 
                         <details>
-                            <summary class="btn btn-primary btn-sm" style="cursor:pointer;">Ajukan Klaim</summary>
-                            <form method="POST" style="margin-top:0.75rem;">
+                            <summary class="btn btn-primary btn-sm">Ajukan Klaim</summary>
+                            <form method="POST">
             <?= csrfField() ?>
                                 <input type="hidden" name="action" value="claim">
                                 <input type="hidden" name="donation_id" value="<?= (int)$item['id'] ?>">
                                 <div class="form-group">
-                                    <label>Jumlah porsi (maks <?= (int)$item['sisa_porsi'] ?>)</label>
-                                    <input type="number" name="porsi_diminta" min="1" max="<?= (int)$item['sisa_porsi'] ?>" required>
+                                    <label>Jumlah porsi (maks <?= (int)$item['sisa_porsi'] ?>)
+                    <input type="number" name="porsi_diminta" min="1" max="<?= (int)$item['sisa_porsi'] ?>" required>
+                </label>
                                 </div>
                                 <div class="form-group">
-                                    <label>Alasan / peruntukan</label>
-                                    <textarea name="alasan" rows="2" placeholder="mis. untuk makan malam 15 anak panti"></textarea>
+                                    <label>Alasan / peruntukan
+                    <textarea name="alasan" rows="2" placeholder="mis. untuk makan malam 15 anak panti"></textarea>
+                </label>
                                 </div>
                                 <?php if ($item['delivery_method'] === 'antar'): ?>
                                     <div class="form-group">
-                                        <label>Alamat kirim</label>
-                                        <textarea name="delivery_address" rows="2" required></textarea>
+                                        <label>Alamat kirim
+                    <textarea name="delivery_address" rows="2" required></textarea>
+                </label>
                                     </div>
                                 <?php endif; ?>
                                 <div class="form-group">
-                                    <label>Jadwal ambil / antar (opsional)</label>
-                                    <input type="datetime-local" name="scheduled_at">
+                                    <label>Jadwal ambil / antar (opsional)
+                    <input type="datetime-local" name="scheduled_at">
+                </label>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-sm">Kirim Klaim</button>
                             </form>
@@ -310,9 +306,9 @@ $claimBadge = [
         </div>
     <?php endif; ?>
 
-    <h2 class="section-title" style="margin-top:2.5rem;">Klaim Saya (<?= count($myClaims) ?>)</h2>
+    <h2 class="section-title" id="klaim-saya">Klaim Saya (<?= count($myClaims) ?>)</h2>
     <?php if (empty($myClaims)): ?>
-        <p class="meta-text">Belum ada klaim.</p>
+        <p class="meta-text empty-state">Belum ada klaim.</p>
     <?php else: ?>
         <div class="grid-cards">
             <?php foreach ($myClaims as $claim): ?>
@@ -348,12 +344,14 @@ $claimBadge = [
                                     <input type="hidden" name="action" value="confirm_receipt">
                                     <input type="hidden" name="claim_id" value="<?= (int)$claim['id'] ?>">
                                     <div class="form-group">
-                                        <label>Foto bukti terima</label>
-                                        <input type="file" name="proof_photo" accept="image/jpeg,image/png,image/webp" required>
+                                        <label>Foto bukti terima
+                    <input type="file" name="proof_photo" accept="image/jpeg,image/png,image/webp" required>
+                </label>
                                     </div>
                                     <div class="form-group">
-                                        <label>Catatan</label>
-                                        <textarea name="received_notes" rows="2" placeholder="mis. diterima lengkap, langsung dibagikan"></textarea>
+                                        <label>Catatan
+                    <textarea name="received_notes" rows="2" placeholder="mis. diterima lengkap, langsung dibagikan"></textarea>
+                </label>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-sm">Konfirmasi Terima</button>
                                 </form>
@@ -362,20 +360,21 @@ $claimBadge = [
 
                         <?php if ($claim['status_claim'] === 'selesai'): ?>
                             <div class="card-actions">
-                                <form method="POST" style="width:100%;">
+                                <form method="POST" class="full-width">
             <?= csrfField() ?>
                                     <input type="hidden" name="action" value="review">
                                     <input type="hidden" name="claim_id" value="<?= (int)$claim['id'] ?>">
                                     <div class="form-group">
-                                        <label><?= $claim['rating'] !== null ? 'Ubah ulasan' : 'Beri ulasan' ?></label>
-                                        <select name="rating">
+                                        <label><?= $claim['rating'] !== null ? 'Ubah ulasan' : 'Beri ulasan' ?>
+                    <select name="rating">
                                             <?php for ($i = 5; $i >= 1; $i--): ?>
                                                 <option value="<?= $i ?>" <?= (int)$claim['rating'] === $i ? 'selected' : '' ?>>&#9733; <?= $i ?></option>
                                             <?php endfor; ?>
                                         </select>
+                </label>
                                     </div>
                                     <div class="form-group">
-                                        <textarea name="komentar" rows="2" placeholder="Ucapan terima kasih atau masukan"><?= e($claim['komentar'] ?? '') ?></textarea>
+                                        <textarea aria-label="Komentar ulasan" name="komentar" rows="2" placeholder="Ucapan terima kasih atau masukan"><?= e($claim['komentar'] ?? '') ?></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-secondary btn-sm">Simpan Ulasan</button>
                                 </form>
@@ -388,9 +387,7 @@ $claimBadge = [
     <?php endif; ?>
 </main>
 
-<footer>
-    <p>&copy; <?= date('Y') ?> Porsela Platform. Supporting SDG 2: Zero Hunger.</p>
-</footer>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 <script src="assets/js/live-search.js"></script>
 </body>
 </html>

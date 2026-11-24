@@ -28,35 +28,15 @@ $recentDistributions = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PORSELA menghubungkan makanan berlebih yang masih layak konsumsi dengan masyarakat yang membutuhkan. Berbagi porsi, menumbuhkan harapan.">
-    <meta name="theme-color" content="#f7f5ed">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
     <title>PORSELA — Berbagi Porsi, Menumbuhkan Harapan</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/home.css">
     <script src="assets/js/home.js" defer></script>
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="home-page">
-<a href="#home-main" class="home-skip">Lewati ke konten utama</a>
-<header class="home-header">
-    <nav class="home-nav home-wrap" aria-label="Navigasi utama">
-        <a href="index.php" class="home-brand" aria-label="PORSELA, beranda" aria-current="page">PORSELA<span class="home-brand-dot" aria-hidden="true">.</span></a>
-        <button class="home-menu-toggle" type="button" aria-expanded="false" aria-controls="home-navigation" hidden>
-            <span>Menu</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
-        </button>
-        <div class="home-nav-links" id="home-navigation">
-            <a href="#cara-berbagi" class="home-nav-link">Cara berbagi</a>
-            <a href="#cerita-berbagi" class="home-nav-link">Cerita berbagi</a>
-            <a href="dashboard.php" class="home-nav-link">Dampak</a>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="home-nav-user">Halo, <?= e($_SESSION['full_name']) ?><small><?= e(roleLabel($_SESSION['role'])) ?></small></span>
-                <a href="<?= e(roleHome($_SESSION['role'])) ?>" class="home-button home-button-green home-nav-cta">Dashboard</a>
-                <a href="logout.php?csrf=<?= csrfToken() ?>" class="home-nav-link">Logout</a>
-            <?php else: ?>
-                <a href="login.php" class="home-nav-link">Login</a>
-                <a href="register.php" class="home-button home-button-green home-nav-cta">Daftar untuk berbagi</a>
-            <?php endif; ?>
-        </div>
-    </nav>
-</header>
+<body class="home-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
 <main id="home-main" tabindex="-1">
     <section class="home-hero home-wrap" aria-labelledby="home-title">
@@ -64,8 +44,8 @@ $recentDistributions = $stmt->fetchAll();
         <div class="home-hero-intro">
             <p>Makanan berlebih, kesempatan untuk peduli. PORSELA menghubungkan makanan yang masih layak konsumsi dengan masyarakat yang membutuhkan.</p>
             <div class="home-actions">
-                <a href="register.php?role=donor" class="home-button home-button-amber">Mulai Berdonasi</a>
-                <a href="register.php?role=beneficiary" class="home-button home-button-outline">Cari Makanan</a>
+                <a href="register.php?role=donor" class="btn btn-accent home-button">Mulai Berdonasi</a>
+                <a href="register.php?role=beneficiary" class="btn btn-outline home-button">Cari Makanan</a>
             </div>
         </div>
         <figure class="home-hero-figure">
@@ -153,19 +133,10 @@ $recentDistributions = $stmt->fetchAll();
 
     <section class="home-closing home-wrap" aria-labelledby="home-closing-title">
         <div><h2 id="home-closing-title">Porsi kecil Anda.<br><em>Arti besar bagi sesama.</em></h2><p>Makanan yang masih baik layak mendapat kesempatan untuk dinikmati. Mari mulai dari yang bisa kita bagikan hari ini.</p></div>
-        <a href="register.php" class="home-button home-button-green">Jadi bagian dari PORSELA</a>
+        <a href="register.php" class="btn btn-primary home-button">Jadi bagian dari PORSELA</a>
     </section>
 </main>
 
-<footer class="home-footer">
-    <div class="home-wrap">
-        <div class="home-footer-top">
-            <div><a href="index.php" class="home-brand" aria-label="PORSELA, beranda">PORSELA<span class="home-brand-dot" aria-hidden="true">.</span></a><p>Porsi berlebih jadi makanan.<br>Kepedulian menjadi kebersamaan.</p></div>
-            <nav class="home-footer-links" aria-label="Navigasi footer"><a href="#cara-berbagi">Cara berbagi</a><a href="dashboard.php">Dampak bersama</a><a href="register.php">Bergabung</a></nav>
-            <div class="home-sdg"><span class="home-sdg-number" aria-hidden="true">2</span><p>Mendukung SDG 2<strong>Zero Hunger</strong><span>Bersama menuju dunia tanpa kelaparan.</span></p></div>
-        </div>
-        <div class="home-footer-bottom"><p>&copy; <?= date('Y') ?> PORSELA Platform</p><p>Dibangun dengan HTML, CSS &amp; PHP native.</p></div>
-    </div>
-</footer>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
