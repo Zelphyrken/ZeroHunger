@@ -7,6 +7,6 @@
             </nav>
             <div class="site-sdg"><span class="site-sdg-number" aria-hidden="true">2</span><p>Mendukung SDG 2<strong>Zero Hunger</strong><span>Bersama menuju dunia tanpa kelaparan.</span></p></div>
         </div>
-        <div class="site-footer-bottom"><p>&copy; <?= date('Y') ?> PORSELA Platform</p><p>Dibangun dengan HTML, CSS &amp; PHP native.</p></div>
+        <div class="site-footer-bottom"><p>&copy; <?= date('Y') ?> PORSELA Platform</p></div>
     </div>
 </footer>
