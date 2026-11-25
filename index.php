@@ -28,7 +28,7 @@ $recentDistributions = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PORSELA menghubungkan makanan berlebih yang masih layak konsumsi dengan masyarakat yang membutuhkan. Berbagi porsi, menumbuhkan harapan.">
-    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>PORSELA — Berbagi Porsi, Menumbuhkan Harapan</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/home.css">

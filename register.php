@@ -62,16 +62,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>Register - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
     <script src="assets/js/site.js" defer></script>
 </head>
-<body class="app-page <?= themeClass() ?>">
-<?php require __DIR__ . '/includes/navigation.php'; ?>
+<body class="app-page auth-page auth-register <?= themeClass() ?>">
+<a href="#main-content" class="site-skip">Lewati ke konten utama</a>
+<div class="auth-shell">
+    <header class="auth-header">
+        <nav class="auth-nav" aria-label="Navigasi autentikasi">
+            <a href="index.php" class="site-brand" aria-label="PORSELA, beranda" translate="no">PORSELA<span aria-hidden="true">.</span></a>
+            <a href="index.php" class="auth-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>Kembali ke beranda</a>
+        </nav>
+    </header>
 
 <main class="container auth-layout" id="main-content" tabindex="-1">
-    <section class="auth-story"><h1>Satu akun. Banyak kesempatan berbagi.</h1><p>Jadi donatur atau penerima. Mulai dari satu porsi untuk membuat kepedulian sampai ke meja berikutnya.</p><a href="index.php">Tentang PORSELA</a></section>
+    <section class="auth-story"><h1>Satu akun. Banyak kesempatan berbagi.</h1><p>Jadi donatur atau penerima. Mulai dari satu porsi untuk membuat kepedulian sampai ke meja berikutnya.</p></section>
+    <div class="auth-form-panel">
     <div class="auth-box">
         <h2>Bergabung dengan PORSELA</h2>
         <?php if ($error): ?>
@@ -80,42 +89,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST">
             <?= csrfField() ?>
-            <div class="form-group">
-                <label>Saya ingin bergabung sebagai
-                    <select name="role" required>
-                    <option value="donor" <?= $selectedRole === 'donor' ? 'selected' : '' ?>>Donatur (berbagi makanan)</option>
-                    <option value="beneficiary" <?= $selectedRole === 'beneficiary' ? 'selected' : '' ?>>Penerima (mencari makanan)</option>
-                </select>
+            <fieldset class="auth-roles" aria-describedby="auth-role-note">
+                <legend>Saya ingin bergabung sebagai</legend>
+                <div class="auth-role-options">
+                <label class="auth-role-card">
+                    <input type="radio" name="role" value="donor" required <?= ($role ?? $selectedRole) === 'donor' ? 'checked' : '' ?>>
+                    <span><strong>Donatur</strong> <small>(berbagi makanan)</small></span>
                 </label>
-                <p class="form-hint">Akun donor masuk antrean verifikasi admin dulu. Selama belum diverifikasi, donasinya tidak tampil di pencarian penerima.</p>
-            </div>
+                <label class="auth-role-card">
+                    <input type="radio" name="role" value="beneficiary" required <?= ($role ?? $selectedRole) === 'beneficiary' ? 'checked' : '' ?>>
+                    <span><strong>Penerima</strong> <small>(mencari makanan)</small></span>
+                </label>
+                </div>
+            </fieldset>
             <div class="form-group">
                 <label>Nama lengkap
+                    <span class="auth-input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>
                     <input autocomplete="name" type="text" name="full_name" required value="<?= e($_POST['full_name'] ?? '') ?>">
+                    </span>
                 </label>
             </div>
             <div class="form-group">
                 <label>Alamat email
+                    <span class="auth-input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg>
                     <input autocomplete="email" spellcheck="false" type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+                    </span>
                 </label>
             </div>
             <div class="form-group">
                 <label>Nomor HP / WhatsApp
+                    <span class="auth-input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 2a15 15 0 0 1-7-7l2-2-2-5Z"/></svg>
                     <input autocomplete="tel" inputmode="tel" type="text" name="phone" required placeholder="e.g. 08123456789" value="<?= e($_POST['phone'] ?? '') ?>">
+                    </span>
                 </label>
             </div>
             <div class="form-group">
                 <label>Password (minimal 6 karakter)
+                    <span class="auth-input">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg>
                     <input autocomplete="new-password" type="password" name="password" required minlength="6">
+                    </span>
                 </label>
             </div>
             <button type="submit" class="btn btn-primary full-width">Daftar</button>
+            <p class="form-hint auth-note" id="auth-role-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg><span>Akun donor masuk antrean verifikasi admin dulu. Selama belum diverifikasi, donasinya tidak tampil di pencarian penerima.</span></p>
         </form>
         <p class="auth-switch">
             Sudah punya akun? <a href="login.php">Login di sini</a>
         </p>
     </div>
+    </div>
 </main>
+</div>
 <?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

@@ -40,7 +40,7 @@ $ratingAvg = $reviewRow['rata'] !== null ? round((float)$reviewRow['rata'], 1) :
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#15251e' : '#f7f5ed' ?>">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>Dampak - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/site.js" defer></script>
