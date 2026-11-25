@@ -47,40 +47,32 @@ $audit = $pdo->query("
 $verifBadge = ['pending' => 'badge-pending', 'verified' => 'badge-distributed', 'rejected' => 'badge-claimed'];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>Admin Dashboard - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <span class="nav-user">Admin: <?= e($_SESSION['full_name']) ?></span>
-            <a href="admin_categories.php" class="btn btn-outline btn-sm">Kategori</a>
-            <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-            <a href="index.php" class="btn btn-outline btn-sm">Home</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page admin-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<div class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Pengawasan komunitas</h1><p>Tinjau donatur, verifikasi akun, dan pantau distribusi makanan.</p></header>
     <?php if ($error): ?>
-        <div class="alert alert-error"><?= e($error) ?></div>
+        <div class="alert alert-error" role="alert"><?= e($error) ?></div>
     <?php endif; ?>
     <?php if ($success): ?>
-        <div class="alert alert-success"><?= e($success) ?></div>
+        <div class="alert alert-success" role="status"><?= e($success) ?></div>
     <?php endif; ?>
 
     <h2 class="section-title">Donatur Menunggu Verifikasi (<?= count($pending) ?>)</h2>
     <?php if (empty($pending)): ?>
-        <p class="meta-text">Tidak ada antrean verifikasi.</p>
+        <p class="meta-text empty-state">Tidak ada antrean verifikasi.</p>
     <?php else: ?>
-        <div class="grid-cards">
+        <div class="grid-cards verification-list">
             <?php foreach ($pending as $donor): ?>
                 <article class="card">
                     <div class="card-body">
@@ -110,8 +102,11 @@ $verifBadge = ['pending' => 'badge-pending', 'verified' => 'badge-distributed', 
         </div>
     <?php endif; ?>
 
-    <h2 class="section-title" style="margin-top:2.5rem;">Semua Akun (<?= count($accounts) ?>)</h2>
-    <div class="grid-cards">
+    <h2 class="section-title">Semua Akun (<?= count($accounts) ?>)</h2>
+    <?php if (empty($accounts)): ?>
+        <p class="empty-state">Belum ada akun untuk ditampilkan.</p>
+    <?php endif; ?>
+    <div class="grid-cards account-list">
         <?php foreach ($accounts as $acc): ?>
             <article class="card">
                 <div class="card-body">
@@ -133,8 +128,11 @@ $verifBadge = ['pending' => 'badge-pending', 'verified' => 'badge-distributed', 
         <?php endforeach; ?>
     </div>
 
-    <h2 class="section-title" style="margin-top:2.5rem;">Audit Donasi (30 terbaru)</h2>
-    <div class="grid-cards">
+    <h2 class="section-title">Audit Donasi (30 terbaru)</h2>
+    <?php if (empty($audit)): ?>
+        <p class="empty-state">Belum ada donasi untuk diaudit.</p>
+    <?php endif; ?>
+    <div class="grid-cards audit-list">
         <?php foreach ($audit as $row): ?>
             <article class="card">
                 <div class="card-body">
@@ -154,10 +152,7 @@ $verifBadge = ['pending' => 'badge-pending', 'verified' => 'badge-distributed', 
             </article>
         <?php endforeach; ?>
     </div>
-</div>
-
-<footer>
-    <p>&copy; <?= date('Y') ?> Porsela Platform &mdash; panel pengawasan donatur. Supporting SDG 2: Zero Hunger.</p>
-</footer>
+</main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

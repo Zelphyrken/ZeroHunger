@@ -64,34 +64,28 @@ $me = $stmt->fetch();
 $theme = ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : 'light';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>Profil - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <a href="<?= e(roleHome($me['role'])) ?>" class="btn btn-outline btn-sm">Dashboard</a>
-            <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Profil & preferensi</h1><p>Kelola informasi akun, keamanan, dan tampilan PORSELA Anda.</p></header>
     <?php if ($error): ?>
-        <div class="alert alert-error"><?= e($error) ?></div>
+        <div class="alert alert-error" role="alert"><?= e($error) ?></div>
     <?php endif; ?>
     <?php if ($success): ?>
-        <div class="alert alert-success"><?= e($success) ?></div>
+        <div class="alert alert-success" role="status"><?= e($success) ?></div>
     <?php endif; ?>
 
-    <div class="grid-cards">
+    <div class="profile-grid">
         <section class="form-panel">
             <h2 class="section-title">Profil</h2>
             <p class="meta-text">
@@ -108,12 +102,14 @@ $theme = ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : 'light';
             <?= csrfField() ?>
                 <input type="hidden" name="action" value="profile">
                 <div class="form-group">
-                    <label>Nama</label>
-                    <input type="text" name="full_name" required value="<?= e($me['full_name']) ?>">
+                    <label>Nama
+                    <input autocomplete="name" type="text" name="full_name" required value="<?= e($me['full_name']) ?>">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Nomor HP / WhatsApp</label>
-                    <input type="text" name="phone" required value="<?= e($me['phone']) ?>">
+                    <label>Nomor HP / WhatsApp
+                    <input autocomplete="tel" inputmode="tel" type="text" name="phone" required value="<?= e($me['phone']) ?>">
+                </label>
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Simpan Profil</button>
             </form>
@@ -125,12 +121,14 @@ $theme = ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : 'light';
             <?= csrfField() ?>
                 <input type="hidden" name="action" value="password">
                 <div class="form-group">
-                    <label>Password lama</label>
-                    <input type="password" name="current_password" required>
+                    <label>Password lama
+                    <input autocomplete="current-password" type="password" name="current_password" required>
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Password baru (min. 6 karakter)</label>
-                    <input type="password" name="new_password" required minlength="6">
+                    <label>Password baru (min. 6 karakter)
+                    <input autocomplete="new-password" type="password" name="new_password" required minlength="6">
+                </label>
                 </div>
                 <button type="submit" class="btn btn-secondary btn-sm">Ganti Password</button>
             </form>
@@ -143,16 +141,18 @@ $theme = ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : 'light';
             <?= csrfField() ?>
                 <input type="hidden" name="action" value="theme">
                 <div class="form-group">
-                    <label>Tema</label>
+                    <label>Tema
                     <select name="theme">
                         <option value="light" <?= $theme === 'light' ? 'selected' : '' ?>>Terang</option>
                         <option value="dark" <?= $theme === 'dark' ? 'selected' : '' ?>>Gelap</option>
                     </select>
+                </label>
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Simpan Tema</button>
             </form>
         </section>
     </div>
 </main>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

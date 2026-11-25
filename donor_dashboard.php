@@ -157,41 +157,35 @@ $claimBadge = [
 $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' => 'selesai'];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= themeClass() === 'dark' ? '#101D24' : '#F7F7F7' ?>">
     <title>Donor Dashboard - Porsela</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/site.js" defer></script>
 </head>
-<body class="<?= themeClass() ?>">
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.php" class="brand">Porsela</a>
-        <div class="nav-links">
-            <span class="nav-user">Donor: <?= e($_SESSION['full_name']) ?></span>
-            <a href="dashboard.php" class="btn btn-outline btn-sm">Dampak</a>
-            <a href="profile.php" class="btn btn-outline btn-sm">Profil</a>
-            <a href="index.php" class="btn btn-outline btn-sm">Home</a>
-            <a href="logout.php?csrf=<?= csrfToken() ?>" class="btn btn-outline btn-sm">Logout</a>
-        </div>
-    </div>
-</nav>
+<body class="app-page <?= themeClass() ?>">
+<?php require __DIR__ . '/includes/navigation.php'; ?>
 
-<main class="container">
+<main class="container" id="main-content" tabindex="-1">
+    <header class="page-header"><h1>Ruang berbagi Anda</h1><p>Bagikan makanan berlebih, tanggapi klaim, dan ikuti penyalurannya.</p><nav class="section-links" aria-label="Bagian dashboard"><a href="#bagikan">Bagikan makanan</a><a href="#klaim-masuk">Klaim masuk</a><a href="#donasi-saya">Donasi saya</a></nav></header>
     <?php if (!$isVerified): ?>
-        <div class="alert alert-error">
+        <div class="alert alert-warning" role="status">
             <strong>Akunmu belum diverifikasi admin.</strong> Donasi tetap bisa dibuat, tapi belum tampil di pencarian penerima.
         </div>
     <?php endif; ?>
 
+    <details class="donation-composer" id="bagikan" <?= ($error || $success) ? 'open' : '' ?>>
+        <summary class="btn btn-primary">Bagikan makanan berlebih</summary>
     <section class="form-panel">
         <h2 class="section-title">Bagikan Makanan Berlebih</h2>
         <?php if ($error): ?>
-            <div class="alert alert-error"><?= e($error) ?></div>
+            <div class="alert alert-error" role="alert"><?= e($error) ?></div>
         <?php endif; ?>
         <?php if ($success): ?>
-            <div class="alert alert-success"><?= e($success) ?></div>
+            <div class="alert alert-success" role="status"><?= e($success) ?></div>
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
@@ -199,57 +193,66 @@ $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' 
             <input type="hidden" name="action" value="create">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Nama Makanan</label>
+                    <label>Nama Makanan
                     <input type="text" name="title" required placeholder="e.g. Nasi Kotak Ayam Bakar">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Kategori</label>
+                    <label>Kategori
                     <select name="category_id" required>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= (int)$cat['id'] ?>"><?= e($cat['nama']) ?></option>
                         <?php endforeach; ?>
                     </select>
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Jumlah Porsi</label>
+                    <label>Jumlah Porsi
                     <input type="number" name="porsi" min="1" required placeholder="e.g. 30">
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Batas Layak Konsumsi</label>
+                    <label>Batas Layak Konsumsi
                     <input type="datetime-local" name="expires_at" required>
+                </label>
                     <p class="form-hint">Setelah lewat waktu ini, donasi otomatis hilang dari pencarian penerima.</p>
                 </div>
                 <div class="form-group">
-                    <label>Metode Penyerahan</label>
+                    <label>Metode Penyerahan
                     <select name="delivery_method" required>
                         <option value="ambil">Diambil sendiri oleh penerima</option>
                         <option value="antar">Saya antarkan ke alamat penerima</option>
                     </select>
+                </label>
                 </div>
                 <div class="form-group">
-                    <label>Foto Makanan</label>
+                    <label>Foto Makanan
                     <input type="file" name="item_photo" accept="image/jpeg,image/png,image/webp" required>
+                </label>
                     <p class="form-hint">JPG, PNG, atau WEBP (maks 5MB)</p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Alamat / Lokasi</label>
-                <input type="text" name="pickup_address" required placeholder="Alamat lengkap tempat makanan diambil atau dikirim">
+                <label>Alamat / Lokasi
+                    <input type="text" name="pickup_address" required placeholder="Alamat lengkap tempat makanan diambil atau dikirim">
+                </label>
             </div>
 
             <div class="form-group">
-                <label>Deskripsi &amp; Catatan Allergen</label>
-                <textarea name="description" rows="3" required placeholder="Kondisi makanan, isi paket, jam dibuat, catatan alergen (mis. mengandung kacang)."></textarea>
+                <label>Deskripsi &amp; Catatan Allergen
+                    <textarea name="description" rows="3" required placeholder="Kondisi makanan, isi paket, jam dibuat, catatan alergen (mis. mengandung kacang)."></textarea>
+                </label>
             </div>
 
             <button type="submit" class="btn btn-primary">Posting Donasi</button>
         </form>
     </section>
+    </details>
 
-    <h2 class="section-title">Klaim Masuk (<?= count($incomingClaims) ?>)</h2>
+    <h2 class="section-title" id="klaim-masuk">Klaim Masuk (<?= count($incomingClaims) ?>)</h2>
     <?php if (empty($incomingClaims)): ?>
-        <p class="meta-text">Belum ada penerima yang mengajukan klaim.</p>
+        <p class="meta-text empty-state">Belum ada penerima yang mengajukan klaim.</p>
     <?php else: ?>
         <div class="grid-cards">
             <?php foreach ($incomingClaims as $claim): ?>
@@ -268,7 +271,7 @@ $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' 
                             <?php endif; ?>
                         </p>
                         <?php if ($claim['alasan']): ?>
-                            <p style="font-size:0.9rem;">"<?= e($claim['alasan']) ?>"</p>
+                            <p class="meta-text">"<?= e($claim['alasan']) ?>"</p>
                         <?php endif; ?>
                         <?php if ($claim['delivery_address']): ?>
                             <p class="meta-text"><strong>Alamat kirim:</strong> <?= e($claim['delivery_address']) ?></p>
@@ -276,9 +279,9 @@ $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' 
                         <?php if ($claim['proof_photo']): ?>
                             <div class="proof-box">
                                 <p><strong>Bukti terima dari penerima</strong></p>
-                                <img src="<?= e($claim['proof_photo']) ?>" alt="Bukti terima" class="proof-img">
+                                <img src="<?= e($claim['proof_photo']) ?>" alt="Bukti terima" class="proof-img" width="640" height="480" loading="lazy" decoding="async" data-site-image>
                                 <?php if ($claim['received_notes']): ?>
-                                    <p style="margin-top:0.5rem;">"<?= e($claim['received_notes']) ?>"</p>
+                                    <p>"<?= e($claim['received_notes']) ?>"</p>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
@@ -309,14 +312,14 @@ $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' 
         </div>
     <?php endif; ?>
 
-    <h2 class="section-title" style="margin-top:2.5rem;">Donasi Saya (<?= count($myDonations) ?>)</h2>
+    <h2 class="section-title" id="donasi-saya">Donasi Saya (<?= count($myDonations) ?>)</h2>
     <?php if (empty($myDonations)): ?>
-        <p class="meta-text">Belum ada donasi.</p>
+        <p class="meta-text empty-state">Belum ada donasi.</p>
     <?php else: ?>
         <div class="grid-cards">
             <?php foreach ($myDonations as $d): ?>
                 <article class="card">
-                    <img src="<?= e($d['item_photo']) ?>" alt="Foto makanan" style="width:100%;height:170px;object-fit:cover;">
+                    <img src="<?= e($d['item_photo']) ?>" alt="Foto makanan" class="card-photo" width="640" height="480" loading="lazy" decoding="async" data-site-image>
                     <div class="card-body">
                         <div>
                             <span class="badge badge-<?= e($d['status']) ?>"><?= e($statusLabel[$d['status']] ?? $d['status']) ?></span>
@@ -350,8 +353,6 @@ $statusLabel = ['pending' => 'tersedia', 'claimed' => 'diproses', 'distributed' 
     <?php endif; ?>
 </main>
 
-<footer>
-    <p>&copy; <?= date('Y') ?> Porsela Platform. Supporting SDG 2: Zero Hunger.</p>
-</footer>
+<?php require __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
