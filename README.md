@@ -2,7 +2,7 @@
 
 ## 1. Nama dan Deskripsi Proyek
 
-**Nama proyek:** Porsela (dari "porsi selamat")
+**Nama proyek:** Porsela (dari "porsi sela")
 
 **Deskripsi:** Porsela adalah aplikasi web yang menghubungkan pemilik makanan berlebih dengan pihak yang membutuhkan. Restoran, katering, toko roti, maupun rumah tangga bisa memublikasikan makanan yang masih layak konsumsi; panti asuhan, posyandu, dan dapur umum komunitas bisa mencari dan mengklaim porsi sesuai kebutuhan, lalu mengunggah bukti terima sebagai jejak penyaluran.
 
