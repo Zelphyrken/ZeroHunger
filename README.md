@@ -2,7 +2,7 @@
 
 ## 1. Nama dan Deskripsi Proyek
 
-**Nama proyek:** Porsela (dari "porsi selamat")
+**Nama proyek:** Porsela (dari "porsi sela")
 
 **Deskripsi:** Porsela adalah aplikasi web yang menghubungkan pemilik makanan berlebih dengan pihak yang membutuhkan. Restoran, katering, toko roti, maupun rumah tangga bisa memublikasikan makanan yang masih layak konsumsi; panti asuhan, posyandu, dan dapur umum komunitas bisa mencari dan mengklaim porsi sesuai kebutuhan, lalu mengunggah bukti terima sebagai jejak penyaluran.
 
@@ -43,12 +43,11 @@ Porsela menjawab ketiganya: makanan berlebih dipublikasikan lengkap dengan jumla
 | 7 | Pelacakan status penyaluran | Status donasi `pending` → `claimed` → `distributed` dan status klaim `menunggu` → `disetujui` → `selesai` / `ditolak` |
 | 8 | Bukti terima & ulasan | Penerima mengunggah foto bukti terima plus catatan, lalu memberi ulasan bintang 1–5 |
 | 9 | Dashboard statistik dampak | Halaman publik berisi porsi terselamatkan, penerima terbantu, donatur aktif, donasi menunggu klaim, rekap per kategori dan metode penyerahan |
+| 10 | Verifikasi akun donatur | Admin menyetujui atau menolak akun donatur; akun berstatus menunggu tidak menampilkan donasinya di pencarian penerima |
+| 11 | Pengawasan & audit admin | Daftar seluruh akun beserta status verifikasinya, audit read-only 30 donasi terbaru, dan blokir akun yang ditolak |
+| 12 | Pengamanan transaksi & form | Token CSRF di semua form POST dan tautan logout; klaim diproses dalam transaksi dengan penguncian baris; donasi yang sudah diklaim tidak bisa diedit atau dihapus |
 
-Modul tambahan (pengembangan dari rancangan awal):
-
-- **Verifikasi donatur oleh admin.** Akun donatur baru berstatus menunggu; donasinya tidak tampil di pencarian sampai diverifikasi. Ini menjawab risiko donatur fiktif.
-- **Penguncian donasi ber-klaim.** Donasi yang sudah diklaim tidak bisa diedit atau dihapus, supaya porsi yang sudah dijanjikan tidak hilang.
-- **Pengamanan CSRF & validasi transaksional.** Setiap form POST membawa token; klaim divalidasi di dalam transaksi sehingga porsi yang sama tidak bisa diklaim dua penerima.
+Dua belas modul di atas adalah yang berjalan di aplikasi. Aturan detail tiap modul (perhitungan sisa porsi, kadaluarsa, metode penyerahan, ulasan) ada di bagian **Aturan bisnis penting** pada Lampiran.
 
 ## 4. Teknologi yang Digunakan
 
@@ -76,7 +75,7 @@ cd ZeroHunger
 
 **Langkah 2 — letakkan di folder web server (opsional)**
 
-Salin folder proyek ke `C:\xampp\htdocs\porsela` agar bisa diakses lewat Apache. Bisa juga dijalankan langsung dari lokasi clone memakai server bawaan PHP (lihat bagian 6).
+Salin folder proyek ke `C:\xampp\htdocs\ZeroHunger` agar bisa diakses lewat Apache. Bisa juga dijalankan langsung dari lokasi clone memakai server bawaan PHP (lihat bagian 6).
 
 **Langkah 3 — jalankan Apache dan MySQL** dari XAMPP Control Panel.
 
@@ -114,14 +113,14 @@ $password = '';          // kosongkan bila MySQL lokal tanpa password
 
 **Cara A — lewat Apache (disarankan)**
 
-1. Pastikan proyek berada di `C:\xampp\htdocs\porsela` dan Apache + MySQL aktif.
-2. Buka `http://localhost/porsela/index.php`.
+1. Pastikan proyek berada di `C:\xampp\htdocs\ZeroHunger` dan Apache + MySQL aktif.
+2. Buka `http://localhost/ZeroHunger/index.php`.
 3. Halaman utama menampilkan statistik dampak dan daftar penyaluran terverifikasi. Dari navbar: **Login**, **Register**, **Dampak**.
 
 **Cara B — server bawaan PHP (tanpa Apache)**
 
 ```
-C:\xampp\php\php.exe -S localhost:8000 -t E:\ZeroHunger
+C:\xampp\php\php.exe -S localhost:8000 -t C:\xampp\htdocs\ZeroHunger
 ```
 
 Lalu buka `http://localhost:8000/index.php`.
